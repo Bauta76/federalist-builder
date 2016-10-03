@@ -38,6 +38,7 @@ http.createServer(function(req, res) {
 }).listen(port || 8000);
 
 // Start watching the queue
+let startTime = new Date()
 checkQueue();
 
 // Check SQS queue
@@ -52,7 +53,10 @@ function checkQueue() {
     if (data && data.Messages && data.Messages[0]) {
       checkCapacity(data.Messages[0]);
     }
-    checkQueue();
+    // Quit after a second if we're running tests
+    if (new Date() - startTime < 1000 || typeof global.it !== 'function') {
+      checkQueue();
+    }
   });
 }
 
